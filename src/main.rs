@@ -1,6 +1,7 @@
 use iced::{
     widget::{button, column, container, row, text},
-    Alignment::Center, Color, Element, Theme,
+    Alignment::Center,
+    Color, Element, Theme,
 };
 
 fn main() -> iced::Result {
@@ -36,12 +37,12 @@ fn update(state: &mut BurnBabyBurn, message: Incinerator) {
 
 fn view(state: &BurnBabyBurn) -> Element<Incinerator> {
     let square_with_text = container(column!["Burn,", "Baby Burn!"].align_x(Center))
-        .align_x(Center)
-        .align_y(Center)
-        .height(200)
-        .width(200);
-
+        .center_x(200)
+        .center_y(200);
+   
     let trigger = button(square_with_text)
+        .height(150)
+        .width(150)
         .on_press(Incinerator::Incinerate)
         .style(burning_style);
 
@@ -62,21 +63,33 @@ pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
     use iced::{border, Background, Shadow, Vector};
 
     let base_style = button::Style {
-        border: border::rounded(500),
+        text_color: Color::WHITE,
+        border: border::rounded(150),
         shadow: Shadow {
             color: Color::BLACK,
-            offset: Vector::new(30.0, 30.0),
-            blur_radius: 40.0,
+            offset: Vector::new(5.0, 5.0),
+            blur_radius: 15.0,
         },
         background: Some(Background::Color(Color::new(1.0, 0.0, 0.0, 1.0))),
         ..Style::default()
+    };
+
+    let hovered_style = button::Style {
+        text_color: Color::BLACK,
+        border: border::rounded(150),
+        shadow: Shadow {
+            color: Color::BLACK,
+            offset: Vector::new(5.0, 5.0),
+            blur_radius: 15.0,
+        },
+        background: Some(Background::Color(Color::new(1.0, 0.0, 0.0, 0.90))),
     };
 
     match status {
         // Status::Active | Status::Pressed | Status::Hovered => our_style,
         Status::Active => base_style,
         Status::Pressed => base_style,
-        Status::Hovered => base_style,
+        Status::Hovered => hovered_style,
         Status::Disabled => Style {
             background: base_style
                 .background
