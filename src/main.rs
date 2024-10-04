@@ -1,52 +1,73 @@
 use iced::{
+    border::Radius,
     widget::{button, column, container, row, text},
     Alignment::Center,
-    Color, Element, Theme,
+    Border, Color, Element, Theme,
 };
+
+use iced_gif::{gif, Frames};
+
+use iced::widget::image;
+use std::fs::File;
+use std::io::Read;
 
 fn main() -> iced::Result {
     iced::run("Watch the World Burn", update, view)
 }
 
-struct BurnBabyBurn {
+// musisz gdzieś zapisać klatki, które bedziesz chciała wyświetlić w widgecie
+// dobrym miejscem jest nasz State, tak myślę.
+struct WorldState {
     text: String,
     button_size: f32,
+    frames: Frames, // zostaw to w spokoju, to jest ok
 }
 
-impl Default for BurnBabyBurn {
+impl Default for WorldState {
     fn default() -> Self {
+        let mut gif_file = File::open("src/nyan_heart.gif").unwrap();
+        let mut byte_buffer = Vec::new();
+        gif_file.read_to_end(&mut byte_buffer).unwrap(); // <- tu przekazaliśmy pożyczony byte_buffer
+                                                         // żebyśmy mogli go edytować,
+                                                         // a właściwie uzupełnić klatkami.
+        let frames = Frames::from_bytes(byte_buffer).unwrap();
+
         Self {
             text: String::from("Come on, press it... I know you want to!"),
             button_size: 200.0,
+            frames,
         }
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum Incinerator {
+enum IncineratorMessage {
     Incinerate,
 }
 
-fn update(state: &mut BurnBabyBurn, message: Incinerator) {
+fn update(state: &mut WorldState, message: IncineratorMessage) {
     println!("update()");
 
-    use Incinerator::*;
+    use IncineratorMessage::*;
     if message == Incinerate {
         state.text = ("Burning....").to_string();
-        state.button_size *= 0.9;
         println!("Incinerate");
     }
 }
 
-fn view(state: &BurnBabyBurn) -> Element<Incinerator> {
+fn view(state: &WorldState) -> Element<IncineratorMessage> {
     let square_with_text = container(column!["Burn,", "Baby Burn!"].align_x(Center))
         .align_x(Center)
         .align_y(Center);
 
+    // dobra juz sie nie wpierdalam. :] bo nie mam pojęcia co robię.
+    // natomiast zrobiłem gifa. COOOOOOO????
+    // image("flames.jpg");
+
     let trigger = button(square_with_text)
         .height(state.button_size)
         .width(state.button_size)
-        .on_press(Incinerator::Incinerate)
+        .on_press(IncineratorMessage::Incinerate)
         .style(burning_style);
 
     // .style(move |_, _| button::Style {
@@ -55,19 +76,30 @@ fn view(state: &BurnBabyBurn) -> Element<Incinerator> {
     //     ..button::Style::default()
     // });
 
+    let gif = gif(&state.frames); // a tu jest gif
+
     let prompt = row!(text(&state.text)).padding(10);
-    let contents = column!(prompt, trigger).padding(10);
+    let contents = column!(prompt, trigger, gif).padding(10);
 
     container(contents).into()
 }
 
 pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
     use button::{Status, Style};
-    use iced::{border, Background, Shadow, Vector};
+    use iced::{Background, Shadow, Vector};
 
     let base_style = button::Style {
         text_color: Color::WHITE,
-        border: border::rounded(150),
+        border: Border {
+            color: Color {
+                r: 0.0,
+                g: 0.0,
+                b: 0.0,
+                a: 0.85,
+            },
+            width: 2.5,
+            radius: Radius::new(150.0),
+        },
         shadow: Shadow {
             color: Color::BLACK,
             offset: Vector::new(5.0, 5.0),
@@ -84,20 +116,9 @@ pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
             offset: Vector::new(2.5, 2.5),
             blur_radius: 10.0,
         },
-        background: Some(Background::Color(Color::new(1.0, 0.0, 0.0, 0.90))),
+        background: Some(Background::Color(Color::new(1.0, 0.0, 0.0, 0.0))),
         ..base_style // ..the rest is as in base style
     };
-
-    // let hovered_style = button::Style {
-    //     text_color: Color::BLACK,
-    //     border: border::rounded(150),
-    //     shadow: Shadow {
-    //         color: Color::BLACK,
-    //         offset: Vector::new(5.0, 5.0),
-    //         blur_radius: 15.0,
-    //     },
-    //     background: Some(Background::Color(Color::new(1.0, 0.0, 0.0, 0.90))),
-    // };
 
     match status {
         // Status::Active | Status::Pressed | Status::Hovered => our_style,
