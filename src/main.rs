@@ -1,6 +1,6 @@
 use iced::{
     border::Radius,
-    widget::{button, column, container, row, text},
+    widget::{button, column, container, row, text, Image},
     Alignment::Center,
     Border, Color, Element, Theme,
 };
@@ -21,6 +21,7 @@ struct WorldState {
     text: String,
     button_size: f32,
     frames: Frames, // zostaw to w spokoju, to jest ok
+    image: Image,
 }
 
 impl Default for WorldState {
@@ -31,11 +32,13 @@ impl Default for WorldState {
                                                          // żebyśmy mogli go edytować,
                                                          // a właściwie uzupełnić klatkami.
         let frames = Frames::from_bytes(byte_buffer).unwrap();
+        
 
         Self {
             text: String::from("Come on, press it... I know you want to!"),
             button_size: 200.0,
             frames,
+            image: Image::new("flames.jpg"),
         }
     }
 }
@@ -47,6 +50,7 @@ enum IncineratorMessage {
 
 fn update(state: &mut WorldState, message: IncineratorMessage) {
     println!("update()");
+    
 
     use IncineratorMessage::*;
     if message == Incinerate {
@@ -62,7 +66,6 @@ fn view(state: &WorldState) -> Element<IncineratorMessage> {
 
     // dobra juz sie nie wpierdalam. :] bo nie mam pojęcia co robię.
     // natomiast zrobiłem gifa. COOOOOOO????
-    // image("flames.jpg");
 
     let trigger = button(square_with_text)
         .height(state.button_size)
@@ -76,10 +79,11 @@ fn view(state: &WorldState) -> Element<IncineratorMessage> {
     //     ..button::Style::default()
     // });
 
-    let gif = gif(&state.frames); // a tu jest gif
+    let gif = gif(&state.frames); // a tu jest gif  
+    let flames = Image::new("flames.jpg");
 
     let prompt = row!(text(&state.text)).padding(10);
-    let contents = column!(prompt, trigger, gif).padding(10);
+    let contents = column!(prompt, trigger, gif, flames).padding(10);
 
     container(contents).into()
 }
