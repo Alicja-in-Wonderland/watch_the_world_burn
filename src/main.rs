@@ -6,8 +6,6 @@ use iced::{
 };
 
 use iced_gif::{gif, Frames};
-
-use iced::widget::image;
 use std::fs::File;
 use std::io::Read;
 
@@ -20,8 +18,8 @@ fn main() -> iced::Result {
 struct WorldState {
     text: String,
     button_size: f32,
-    frames: Frames, // zostaw to w spokoju, to jest ok
-    image: Image,
+    frames: Frames,
+    show_image: bool,
 }
 
 impl Default for WorldState {
@@ -38,7 +36,7 @@ impl Default for WorldState {
             text: String::from("Come on, press it... I know you want to!"),
             button_size: 200.0,
             frames,
-            image: Image::new("flames.jpg"),
+            show_image: false,
         }
     }
 }
@@ -55,6 +53,7 @@ fn update(state: &mut WorldState, message: IncineratorMessage) {
     use IncineratorMessage::*;
     if message == Incinerate {
         state.text = ("Burning....").to_string();
+        state.show_image = true;
         println!("Incinerate");
     }
 }
@@ -79,13 +78,22 @@ fn view(state: &WorldState) -> Element<IncineratorMessage> {
     //     ..button::Style::default()
     // });
 
-    let gif = gif(&state.frames); // a tu jest gif  
+    let gif = gif(&state.frames); // a tu jest gif
     let flames = Image::new("flames.jpg");
 
     let prompt = row!(text(&state.text)).padding(10);
-    let contents = column!(prompt, trigger, gif, flames).padding(10);
+    
 
-    container(contents).into()
+    if state.show_image {
+        let contents = column!(prompt, trigger, gif, flames).padding(10);
+        container(contents).into()
+
+    } else {
+        let contents = column!(prompt, trigger).padding(10);
+        container(contents).into()
+    }
+
+    
 }
 
 pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
@@ -104,6 +112,7 @@ pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
             width: 2.5,
             radius: Radius::new(150.0),
         },
+        
         shadow: Shadow {
             color: Color::BLACK,
             offset: Vector::new(5.0, 5.0),
@@ -138,7 +147,3 @@ pub fn burning_style(_theme: &Theme, status: button::Status) -> button::Style {
         },
     }
 }
-
-// fn theme(&self) -> iced::Theme {
-//     iced::Theme::Dark
-// }
