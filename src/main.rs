@@ -24,7 +24,7 @@ struct WorldState {
 
 impl Default for WorldState {
     fn default() -> Self {
-        let mut gif_file = File::open("src/nyan_heart.gif").unwrap();
+        let mut gif_file = File::open("src/watching.gif").unwrap();
         let mut byte_buffer = Vec::new();
         gif_file.read_to_end(&mut byte_buffer).unwrap(); // <- tu przekazaliśmy pożyczony byte_buffer
                                                          // żebyśmy mogli go edytować,
