@@ -1,6 +1,6 @@
 use iced::{
     border::Radius,
-    widget::{button, column, container, row, text, Image},
+    widget::{button, column, container, row, text},
     Alignment::Center,
     Border, Color, Element, Theme,
 };
@@ -19,7 +19,7 @@ struct WorldState {
     text: String,
     button_size: f32,
     frames: Frames,
-    show_image: bool,
+    show_gif: bool,
 }
 
 impl Default for WorldState {
@@ -36,7 +36,7 @@ impl Default for WorldState {
             text: String::from("Come on, press it... I know you want to!"),
             button_size: 200.0,
             frames,
-            show_image: false,
+            show_gif: false,
         }
     }
 }
@@ -53,7 +53,7 @@ fn update(state: &mut WorldState, message: IncineratorMessage) {
     use IncineratorMessage::*;
     if message == Incinerate {
         state.text = ("Burning....").to_string();
-        state.show_image = true;
+        state.show_gif = true;
         println!("Incinerate");
     }
 }
@@ -79,13 +79,13 @@ fn view(state: &WorldState) -> Element<IncineratorMessage> {
     // });
 
     let gif = gif(&state.frames); // a tu jest gif
-    let flames = Image::new("flames.jpg");
+    // let flames = Image::new("flames.jpg");
 
     let prompt = row!(text(&state.text)).padding(10);
     
 
-    if state.show_image {
-        let contents = column!(prompt, trigger, gif, flames).padding(10);
+    if state.show_gif {
+        let contents = column!(prompt, trigger, gif).padding(10);
         container(contents).into()
 
     } else {
